@@ -1097,6 +1097,9 @@ fn chroma_loss(yiq: &mut YiqView, info: &CommonInfo, intensity: f32) {
 
 /// Vertically blend each chroma scanline with the one above it, as VHS does.
 fn chroma_vert_blend(yiq: &mut YiqView) {
+    if yiq.dimensions.1 < 2 {
+        return;
+    }
     let width = yiq.dimensions.0;
     let delay = &mut yiq.scratch[..width * 2];
     delay.fill(0.0);
