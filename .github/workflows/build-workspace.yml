@@ -118,7 +118,7 @@ jobs:
         workspaces: ${{ env.FAST_WORKSPACE }}
 
     - name: Build GUI
-      run: cargo build --release -p gui
+      run: cargo build --release -p ntsc-rs-gui
       working-directory: ${{ env.FAST_WORKSPACE }}
 
     - name: Build OpenFX plugin

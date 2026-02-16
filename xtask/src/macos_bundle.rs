@@ -44,7 +44,7 @@ fn build_for_target(target: &str, release_mode: bool) -> std::io::Result<PathBuf
 
     let mut cargo_args: Vec<_> = vec![
         String::from("build"),
-        String::from("--package=gui"),
+        String::from("--package=ntsc-rs-gui"),
         String::from("--target"),
         target.to_string(),
     ];
