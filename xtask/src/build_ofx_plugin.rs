@@ -128,7 +128,7 @@ fn build_plugin_for_target(target: &Target, release_mode: bool) -> std::io::Resu
     ]);
 
     let mut built_library_path =
-        target_dir_path.plus(target.library_prefix.to_owned() + "openfx_plugin");
+        target_dir_path.plus(target.library_prefix.to_owned() + "ntsc_rs_openfx_plugin");
     built_library_path.set_extension(target.library_extension);
 
     Ok(built_library_path)
