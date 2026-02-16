@@ -91,7 +91,7 @@ fn build_plugin_for_target(
     ]);
 
     let mut built_library_path = target_dir_path.clone();
-    built_library_path.push(target.library_prefix.to_owned() + "ae_plugin");
+    built_library_path.push(target.library_prefix.to_owned() + "ntsc_rs_ae_plugin");
     built_library_path.set_extension(target.library_extension);
 
     let built_rsrc_path = target_dir_path.plus("ae-plugin.rsrc");
