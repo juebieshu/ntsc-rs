@@ -614,7 +614,9 @@ impl NtscApp {
 
                     changed |= resp.changed();
 
-                    let label = ui.add(egui::Label::new(descriptor.label).truncate());
+                    let label = ui.add(
+                        egui::Label::new(t!(format!("setting.{}", descriptor.id.name))).truncate(),
+                    );
                     if let Some(description) = descriptor.description {
                         label.on_hover_text(description);
                     }
@@ -647,12 +649,19 @@ impl NtscApp {
                     .iter()
                     .find(|option| option.index == selected_index)
                     .unwrap();
-                egui::ComboBox::new(&descriptor.id, descriptor.label)
-                    .selected_text(selected_item.label)
+                egui::ComboBox::new(&descriptor.id, t!(format!("setting.{}", descriptor.id.name)))
+                    .selected_text(t!(format!(
+                        "setting.{}.option.{}",
+                        descriptor.id.name, selected_item.index
+                    )))
                     .show_ui(ui, |ui| {
                         for item in options {
+                            let opt_label = t!(format!(
+                                "setting.{}.option.{}",
+                                descriptor.id.name, item.index
+                            ));
                             let mut label =
-                                ui.selectable_label(selected_index == item.index, item.label);
+                                ui.selectable_label(selected_index == item.index, opt_label);
 
                             if let Some(desc) = item.description {
                                 label = label.on_hover_text(desc);
@@ -677,7 +686,7 @@ impl NtscApp {
 
                 let slider: Response = ui.add(
                     egui::Slider::new(&mut value, 0.0..=1.0)
-                        .text(descriptor.label)
+                        .text(t!(format!("setting.{}", descriptor.id.name)))
                         .custom_parser(parse_expression_string)
                         .custom_formatter(format_percentage)
                         .logarithmic(*logarithmic),
@@ -697,7 +706,7 @@ impl NtscApp {
 
                 let slider = ui.add(
                     egui::Slider::new(&mut value, range.clone())
-                        .text(descriptor.label)
+                        .text(t!(format!("setting.{}", descriptor.id.name)))
                         .custom_parser(parse_expression_string),
                 );
 
@@ -720,7 +729,7 @@ impl NtscApp {
 
                 let slider = ui.add(
                     egui::Slider::new(&mut value, range.clone())
-                        .text(descriptor.label)
+                        .text(t!(format!("setting.{}", descriptor.id.name)))
                         .custom_parser(parse_expression_string)
                         .logarithmic(*logarithmic),
                 );
@@ -737,7 +746,8 @@ impl NtscApp {
             } => {
                 let mut value = effect_settings.get_field::<bool>(&descriptor.id).unwrap();
 
-                let checkbox = ui.checkbox(&mut value, descriptor.label);
+                let checkbox =
+                    ui.checkbox(&mut value, t!(format!("setting.{}", descriptor.id.name)));
 
                 if checkbox.changed() {
                     let _ = effect_settings.set_field(&descriptor.id, value);
@@ -768,7 +778,10 @@ impl NtscApp {
 
                         let checkbox = ui
                             .horizontal(|ui| {
-                                let checkbox = ui.checkbox(&mut checked, descriptor.label);
+                                let checkbox = ui.checkbox(
+                                    &mut checked,
+                                    t!(format!("setting.{}", descriptor.id.name)),
+                                );
 
                                 if checkbox.changed() {
                                     let _ = effect_settings.set_field(&descriptor.id, checked);
@@ -1082,15 +1095,25 @@ impl NtscApp {
                             );
                             ui.label(t!("effect.scale_lines"));
                             let mut filter_changed = false;
+                            let selected_filter_key = match self.video_scale.scale.filter {
+                                VideoScaleFilter::Nearest => "video.scale_filter.nearest",
+                                VideoScaleFilter::Bilinear => "video.scale_filter.bilinear",
+                                VideoScaleFilter::Bicubic => "video.scale_filter.bicubic",
+                            };
                             let filter_resp = egui::ComboBox::from_id_salt("video_scale_filter")
-                                .selected_text(self.video_scale.scale.filter.label_and_tooltip().0)
+                                .selected_text(t!(selected_filter_key))
                                 .show_ui(ui, |ui| {
                                     for value in VideoScaleFilter::values() {
-                                        let (label_text, tooltip) = value.label_and_tooltip();
+                                        let filter_key = match value {
+                                            VideoScaleFilter::Nearest => "video.scale_filter.nearest",
+                                            VideoScaleFilter::Bilinear => "video.scale_filter.bilinear",
+                                            VideoScaleFilter::Bicubic => "video.scale_filter.bicubic",
+                                        };
+                                        let (_, tooltip) = value.label_and_tooltip();
                                         let label = ui
                                             .selectable_label(
                                                 *value == self.video_scale.scale.filter,
-                                                label_text,
+                                                t!(filter_key),
                                             )
                                             .on_hover_text(tooltip);
 
@@ -1180,15 +1203,25 @@ impl NtscApp {
         egui::Frame::central_panel(ui.style()).show(ui, |ui| {
             Self::setup_control_rows(ui);
             let mut codec_changed = false;
+            let selected_codec_key = match self.render_settings.output_codec {
+                OutputCodec::H264 => "render.codec.h264",
+                OutputCodec::Ffv1 => "render.codec.ffv1",
+                OutputCodec::PngSequence => "render.codec.png_sequence",
+            };
             egui::ComboBox::from_label(t!("render.codec"))
-                .selected_text(self.render_settings.output_codec.label())
+                .selected_text(t!(selected_codec_key))
                 .show_ui(ui, |ui| {
                     let mut item = |item: OutputCodec| {
+                        let codec_key = match item {
+                            OutputCodec::H264 => "render.codec.h264",
+                            OutputCodec::Ffv1 => "render.codec.ffv1",
+                            OutputCodec::PngSequence => "render.codec.png_sequence",
+                        };
                         codec_changed |= ui
                             .selectable_value(
                                 &mut self.render_settings.output_codec,
                                 item,
-                                item.label(),
+                                t!(codec_key),
                             )
                             .changed();
                     };
@@ -1234,23 +1267,29 @@ impl NtscApp {
                 }
 
                 OutputCodec::Ffv1 => {
+                    let selected_bit_depth_key =
+                        match self.render_settings.ffv1_settings.bit_depth {
+                            Ffv1BitDepth::Bits8 => "render.bit_depth.8",
+                            Ffv1BitDepth::Bits10 => "render.bit_depth.10",
+                            Ffv1BitDepth::Bits12 => "render.bit_depth.12",
+                        };
                     egui::ComboBox::from_label(t!("render.bit_depth"))
-                        .selected_text(self.render_settings.ffv1_settings.bit_depth.label())
+                        .selected_text(t!(selected_bit_depth_key))
                         .show_ui(ui, |ui| {
                             ui.selectable_value(
                                 &mut self.render_settings.ffv1_settings.bit_depth,
                                 Ffv1BitDepth::Bits8,
-                                Ffv1BitDepth::Bits8.label(),
+                                t!("render.bit_depth.8"),
                             );
                             ui.selectable_value(
                                 &mut self.render_settings.ffv1_settings.bit_depth,
                                 Ffv1BitDepth::Bits10,
-                                Ffv1BitDepth::Bits10.label(),
+                                t!("render.bit_depth.10"),
                             );
                             ui.selectable_value(
                                 &mut self.render_settings.ffv1_settings.bit_depth,
                                 Ffv1BitDepth::Bits12,
-                                Ffv1BitDepth::Bits12.label(),
+                                t!("render.bit_depth.12"),
                             );
                         });
 

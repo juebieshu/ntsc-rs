@@ -1,4 +1,5 @@
 use eframe::egui;
+use rust_i18n::t;
 
 use crate::third_party_licenses::get_third_party_licenses;
 
@@ -24,7 +25,7 @@ impl NtscApp {
                                     ui.label(&license.text);
                                 });
                             ui.indent(i, |ui| {
-                                ui.label("Used by:");
+                                ui.label(t!("licenses.used_by"));
                                 for used_by in license.used_by.iter() {
                                     ui.add(egui::Hyperlink::from_label_and_url(
                                         format!("{} {}", used_by.name, used_by.version),

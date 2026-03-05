@@ -15,6 +15,7 @@ use blocking::unblock;
 use eframe::egui::{self, InnerResponse};
 use futures_lite::Future;
 use ntsc_rs::NtscEffectFullSettings;
+use rust_i18n::t;
 use snafu::prelude::*;
 
 use crate::path_compare::cmp_paths;
@@ -360,7 +361,7 @@ impl PresetsListState {
                 ui.add(egui::Spinner::new());
             }
             DirState::Error => {
-                ui.label("Error loading presets directory");
+                ui.label(t!("presets.error_loading"));
             }
             DirState::Loaded(presets) | DirState::Loading(Some(presets)) => {
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
@@ -396,7 +397,7 @@ impl PresetsListState {
                         Some((new_preset_parent, new_preset_name)) if new_preset_parent == dir => {
                             ui.rtl(|ui| {
                                 let close_button = ui.button("🗙");
-                                let save_button = ui.button("Save");
+                                let save_button = ui.button(t!("presets.save"));
                                 let text_edit = ui.add_sized(
                                     ui.available_size(),
                                     egui::TextEdit::singleline(new_preset_name),
@@ -573,7 +574,7 @@ impl PresetsListState {
             let entry_label = ui.add(egui::Button::selectable(selected, label));
 
             entry_label.context_menu(|ui| {
-                if ui.button("Delete").clicked() {
+                if ui.button(t!("presets.delete")).clicked() {
                     action = Some(Action::DeletePreset {
                         path: path.to_owned(),
                         parent: parent.clone(),
@@ -581,7 +582,7 @@ impl PresetsListState {
                     ui.close();
                 }
 
-                if ui.button("Rename").clicked() {
+                if ui.button(t!("presets.rename")).clicked() {
                     *renamed_preset = Some((
                         path.to_path_buf(),
                         path.file_name()
@@ -652,12 +653,12 @@ impl NtscApp {
                 let presets_dir_state = self.presets_state.presets_dir.lock();
 
                 ui.horizontal(|ui| {
-                    if ui.button("Open folder").clicked() {
+                    if ui.button(t!("presets.open_folder")).clicked() {
                         action = Some(Action::OpenPresetsDir {
                             path: presets_dir_path.clone(),
                         });
                     }
-                    if ui.button("Reload").clicked() {
+                    if ui.button(t!("presets.reload")).clicked() {
                         match &*presets_dir_state {
                             DirState::Loading(_) => {}
                             _ => {
@@ -669,7 +670,10 @@ impl NtscApp {
                     }
 
                     if ui
-                        .add_enabled(selected_preset_modified, egui::Button::new("Overwrite"))
+                        .add_enabled(
+                            selected_preset_modified,
+                            egui::Button::new(t!("presets.save")),
+                        )
                         .clicked()
                         && let Some(selected_preset) =
                             self.presets_state.list_state.selected_preset.as_ref()
@@ -680,7 +684,7 @@ impl NtscApp {
                         })
                     }
 
-                    if ui.button("Save as").clicked() {
+                    if ui.button(t!("presets.save_as")).clicked() {
                         let mut preset_name = String::from("preset.json");
                         just_pressed_save = true;
 
