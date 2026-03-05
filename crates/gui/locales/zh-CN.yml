@@ -1,4 +1,5 @@
 zh_cn:
+
   menu.file: "文件"
   menu.file.open: "打开文件"
   menu.file.quit: "退出程序"
@@ -92,7 +93,7 @@ zh_cn:
   updates.error: "更新检查失败："
   updates.latest_version: "最新版本：%{tag}"
 
-  seed.randomize.tooltip: "随机生成随机种子"
+  seed.randomize.tooltip: "随机生成种子"
 
   theme.system.tooltip: "使用系统主题"
   theme.light.tooltip: "浅色界面"
