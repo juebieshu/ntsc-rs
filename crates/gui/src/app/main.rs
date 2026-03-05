@@ -1035,13 +1035,17 @@ impl NtscApp {
                         ui.interact(ui.available_rect_before_wrap(), id, egui::Sense::click());
                     let style = ui.style().interact(&resp);
                     ui.add(
-                        egui::Label::new(egui::RichText::new(t!("effect.presets")).color(style.text_color()))
-                            .selectable(false),
+                        egui::Label::new(
+                            egui::RichText::new(t!("effect.presets")).color(style.text_color()),
+                        )
+                        .selectable(false),
                     );
                 });
 
                 collapse_state.body_unindented(|ui| {
-                    if let Some(dropped_presets) = ui.show_dnd_overlay(t!("effect.presets.drop_to_install")) {
+                    if let Some(dropped_presets) =
+                        ui.show_dnd_overlay(t!("effect.presets.drop_to_install"))
+                    {
                         self.install_presets(
                             dropped_presets.into_iter().filter_map(|file| file.path),
                         );
@@ -1055,7 +1059,8 @@ impl NtscApp {
             if let Some(egui::DroppedFile {
                 path: Some(preset_path),
                 ..
-            }) = self.ensure_single_file_dropped(ui.show_dnd_overlay(t!("effect.settings.drop_to_load")))
+            }) = self
+                .ensure_single_file_dropped(ui.show_dnd_overlay(t!("effect.settings.drop_to_load")))
             {
                 self.load_preset(preset_path);
             }
@@ -1095,7 +1100,9 @@ impl NtscApp {
                                         }
                                     }
                                 });
-                            filter_resp.response.on_hover_text(t!("effect.scale_filter.tooltip"));
+                            filter_resp
+                                .response
+                                .on_hover_text(t!("effect.scale_filter.tooltip"));
                             if (drag_resp.changed() || scale_checkbox.changed() || filter_changed)
                                 && let Some(info) = &self.pipeline
                             {
@@ -1269,7 +1276,10 @@ impl NtscApp {
             ui.separator();
 
             ui.rtl(|ui| {
-                let save_file = ui.button(t!("render.browse")).on_hover_text(t!("render.browse.tooltip")).clicked();
+                let save_file = ui
+                    .button(t!("render.browse"))
+                    .on_hover_text(t!("render.browse.tooltip"))
+                    .clicked();
 
                 ui.ltr(|ui| {
                     ui.label(t!("render.destination_file"));
@@ -1368,7 +1378,10 @@ impl NtscApp {
             ui.add_enabled(
                 self.effect_settings.use_field.interlaced_output_allowed()
                     && self.render_settings.interlaced_output_allowed(),
-                egui::Checkbox::new(&mut self.render_settings.interlaced, t!("render.interlaced")),
+                egui::Checkbox::new(
+                    &mut self.render_settings.interlaced,
+                    t!("render.interlaced"),
+                ),
             )
             .on_disabled_hover_text(
                 if !self.render_settings.interlaced_output_allowed() {
@@ -1554,9 +1567,15 @@ impl NtscApp {
                                     );
                                     if let Some(interlace_mode) = metadata.interlace_mode {
                                         let mode_str: String = match interlace_mode {
-                                            VideoInterlaceMode::Progressive => t!("video.progressive"),
-                                            VideoInterlaceMode::Interleaved => t!("video.interlaced"),
-                                            VideoInterlaceMode::Mixed => t!("video.telecined"),
+                                            VideoInterlaceMode::Progressive => {
+                                                t!("video.progressive").to_string()
+                                            }
+                                            VideoInterlaceMode::Interleaved => {
+                                                t!("video.interlaced").to_string()
+                                            }
+                                            VideoInterlaceMode::Mixed => {
+                                                t!("video.telecined").to_string()
+                                            }
                                             _ => String::new(),
                                         };
                                         if !mode_str.is_empty() {
