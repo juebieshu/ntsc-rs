@@ -1095,13 +1095,13 @@ impl NtscApp {
                             );
                             ui.label(t!("effect.scale_lines"));
                             let mut filter_changed = false;
+                            let selected_filter_key = match self.video_scale.scale.filter {
+                                VideoScaleFilter::Nearest => "video.scale_filter.nearest",
+                                VideoScaleFilter::Bilinear => "video.scale_filter.bilinear",
+                                VideoScaleFilter::Bicubic => "video.scale_filter.bicubic",
+                            };
                             let filter_resp = egui::ComboBox::from_id_salt("video_scale_filter")
-                                .selected_text(t!(match self.video_scale.scale.filter {
-                                    VideoScaleFilter::Nearest => "video.scale_filter.nearest",
-                                    VideoScaleFilter::Bilinear => "video.scale_filter.bilinear",
-                                    VideoScaleFilter::Bicubic => "video.scale_filter.bicubic",
-                                }
-                                .to_string()))
+                                .selected_text(t!(selected_filter_key))
                                 .show_ui(ui, |ui| {
                                     for value in VideoScaleFilter::values() {
                                         let filter_key = match value {
@@ -1203,13 +1203,13 @@ impl NtscApp {
         egui::Frame::central_panel(ui.style()).show(ui, |ui| {
             Self::setup_control_rows(ui);
             let mut codec_changed = false;
+            let selected_codec_key = match self.render_settings.output_codec {
+                OutputCodec::H264 => "render.codec.h264",
+                OutputCodec::Ffv1 => "render.codec.ffv1",
+                OutputCodec::PngSequence => "render.codec.png_sequence",
+            };
             egui::ComboBox::from_label(t!("render.codec"))
-                .selected_text(t!(match self.render_settings.output_codec {
-                    OutputCodec::H264 => "render.codec.h264",
-                    OutputCodec::Ffv1 => "render.codec.ffv1",
-                    OutputCodec::PngSequence => "render.codec.png_sequence",
-                }
-                .to_string()))
+                .selected_text(t!(selected_codec_key))
                 .show_ui(ui, |ui| {
                     let mut item = |item: OutputCodec| {
                         let codec_key = match item {
@@ -1267,13 +1267,14 @@ impl NtscApp {
                 }
 
                 OutputCodec::Ffv1 => {
-                    egui::ComboBox::from_label(t!("render.bit_depth"))
-                        .selected_text(t!(match self.render_settings.ffv1_settings.bit_depth {
+                    let selected_bit_depth_key =
+                        match self.render_settings.ffv1_settings.bit_depth {
                             Ffv1BitDepth::Bits8 => "render.bit_depth.8",
                             Ffv1BitDepth::Bits10 => "render.bit_depth.10",
                             Ffv1BitDepth::Bits12 => "render.bit_depth.12",
-                        }
-                        .to_string()))
+                        };
+                    egui::ComboBox::from_label(t!("render.bit_depth"))
+                        .selected_text(t!(selected_bit_depth_key))
                         .show_ui(ui, |ui| {
                             ui.selectable_value(
                                 &mut self.render_settings.ffv1_settings.bit_depth,
