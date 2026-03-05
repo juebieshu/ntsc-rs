@@ -4,6 +4,7 @@ use std::{
 };
 
 use eframe::egui;
+use rust_i18n::t;
 use snafu::{OptionExt, ResultExt, Snafu};
 use tinyjson::JsonValue;
 use ureq::{config::Config, tls::TlsConfig};
@@ -50,26 +51,26 @@ impl UpdateDialogState {
             }
         }
         let mut open = !matches!(self, UpdateDialogState::Closed);
-        egui::Window::new("Check for Updates")
+        egui::Window::new(t!("updates.title"))
             .open(&mut open)
             .show(ctx, |ui| match &self {
                 UpdateDialogState::Closed => {}
                 UpdateDialogState::Loading(_) => {
                     ui.ltr(|ui| {
-                        ui.label("Checking for updates... ");
+                        ui.label(t!("updates.checking"));
                         ui.add(egui::Spinner::new());
                     });
                 }
                 UpdateDialogState::Loaded(update_response) => {
                     ui.heading(&update_response.latest_release_label);
                     if update_response.up_to_date {
-                        ui.label("✓ Up to date");
-                    } else if ui.button("Download from GitHub ⤴").clicked() {
+                        ui.label(t!("updates.up_to_date"));
+                    } else if ui.button(t!("updates.download")).clicked() {
                         ctx.open_url(egui::OpenUrl::new_tab(&update_response.download_url));
                     }
                 }
                 UpdateDialogState::Error(error) => {
-                    ui.label("Error checking for updates:");
+                    ui.label(t!("updates.error"));
                     ui.monospace(error.to_string());
                 }
             });
@@ -123,7 +124,7 @@ impl UpdateDialogState {
                 let up_to_date = tag_name.strip_prefix("v") == Some(env!("CARGO_PKG_VERSION"));
 
                 Ok(UpdateResponse {
-                    latest_release_label: format!("Latest version: {tag_name}"),
+                    latest_release_label: t!("updates.latest_version", tag = tag_name).to_string(),
                     download_url: html_url.clone(),
                     up_to_date,
                 })

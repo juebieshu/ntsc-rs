@@ -28,6 +28,39 @@ pub mod update_dialog;
 pub type AppFn = Box<dyn FnOnce(&mut NtscApp) -> Result<(), error::ApplicationError> + Send>;
 pub type ApplessFn = Box<dyn FnOnce() -> Result<(), error::ApplicationError> + Send>;
 
+/// Available UI languages.
+#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub enum AppLocale {
+    English,
+    ChineseSimplified,
+}
+
+impl AppLocale {
+    pub fn locale_code(&self) -> &'static str {
+        match self {
+            AppLocale::English => "en",
+            AppLocale::ChineseSimplified => "zh-CN",
+        }
+    }
+
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            AppLocale::English => "English",
+            AppLocale::ChineseSimplified => "中文（简体）",
+        }
+    }
+
+    pub fn all() -> &'static [AppLocale] {
+        &[AppLocale::English, AppLocale::ChineseSimplified]
+    }
+}
+
+impl Default for AppLocale {
+    fn default() -> Self {
+        AppLocale::English
+    }
+}
+
 pub struct NtscApp {
     pub gstreamer_init: GstreamerInitState,
     pub settings_list: SettingsList<NtscEffectFullSettings>,
@@ -55,4 +88,5 @@ pub struct NtscApp {
     pub image_sequence_dialog_queued_render_job: Option<
         Box<dyn FnOnce(&mut Self) -> Result<render_job::RenderJob, error::ApplicationError>>,
     >,
+    pub locale: AppLocale,
 }
