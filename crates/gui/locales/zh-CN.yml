@@ -1,12 +1,10 @@
-zh_cn:
+menu.file: "文件"
+menu.file.open: "打开文件"
+menu.file.quit: "退出程序"
 
-  menu.file: "文件"
-  menu.file.open: "打开文件"
-  menu.file.quit: "退出程序"
-
-  menu.edit: "编辑"
-  menu.edit.undo: "撤销"
-  menu.edit.redo: "重做"
+menu.edit: "编辑"
+menu.edit.undo: "撤销"
+menu.edit.redo: "重做"
 
   menu.view: "视图"
   menu.view.theme: "主题外观"
